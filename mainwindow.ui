@@ -24,127 +24,227 @@
        <attribute name="title">
         <string>Comptes</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout">
-        <item row="0" column="4">
-         <widget class="QDateEdit" name="date_em">
-          <property name="calendarPopup">
-           <bool>true</bool>
-          </property>
-         </widget>
+       <widget class="QDateEdit" name="date_em">
+        <property name="geometry">
+         <rect>
+          <x>283</x>
+          <y>10</y>
+          <width>83</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="calendarPopup">
+         <bool>true</bool>
+        </property>
+       </widget>
+       <widget class="QComboBox" name="context">
+        <property name="geometry">
+         <rect>
+          <x>136</x>
+          <y>10</y>
+          <width>89</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="whatsThis">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>Salaire</string>
+         </property>
         </item>
-        <item row="0" column="2">
-         <widget class="QComboBox" name="context">
-          <property name="whatsThis">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <item>
-           <property name="text">
-            <string>Salaire</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Sport</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Loisir</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Nourriture</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Appartement</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Transport</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Autre</string>
-           </property>
-          </item>
-         </widget>
+        <item>
+         <property name="text">
+          <string>Sport</string>
+         </property>
         </item>
-        <item row="0" column="6">
-         <widget class="QPushButton" name="save">
-          <property name="text">
-           <string>Save</string>
-          </property>
-         </widget>
+        <item>
+         <property name="text">
+          <string>Loisir</string>
+         </property>
         </item>
-        <item row="0" column="0">
-         <widget class="QDoubleSpinBox" name="montant">
-          <property name="decimals">
-           <number>2</number>
-          </property>
-          <property name="maximum">
-           <double>9999.989999999999782</double>
-          </property>
-         </widget>
+        <item>
+         <property name="text">
+          <string>Nourriture</string>
+         </property>
         </item>
-        <item row="3" column="0" colspan="7">
+        <item>
+         <property name="text">
+          <string>Appartement</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Transport</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Autre</string>
+         </property>
+        </item>
+       </widget>
+       <widget class="QPushButton" name="save">
+        <property name="geometry">
+         <rect>
+          <x>692</x>
+          <y>9</y>
+          <width>75</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Save</string>
+        </property>
+       </widget>
+       <widget class="QDoubleSpinBox" name="montant">
+        <property name="geometry">
+         <rect>
+          <x>9</x>
+          <y>10</y>
+          <width>67</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="decimals">
+         <number>2</number>
+        </property>
+        <property name="maximum">
+         <double>9999.989999999999782</double>
+        </property>
+       </widget>
+       <widget class="QLineEdit" name="com">
+        <property name="geometry">
+         <rect>
+          <x>372</x>
+          <y>10</y>
+          <width>311</width>
+          <height>20</height>
+         </rect>
+        </property>
+        <property name="inputMask">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Commentaire</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="debit">
+        <property name="geometry">
+         <rect>
+          <x>82</x>
+          <y>12</y>
+          <width>48</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Debit</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="auto_2">
+        <property name="geometry">
+         <rect>
+          <x>231</x>
+          <y>12</y>
+          <width>46</width>
+          <height>17</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Auto</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="totalDebit">
+        <property name="geometry">
+         <rect>
+          <x>90</x>
+          <y>40</y>
+          <width>101</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+       <widget class="QProgressBar" name="progressBar">
+        <property name="geometry">
+         <rect>
+          <x>260</x>
+          <y>40</y>
+          <width>381</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="value">
+         <number>24</number>
+        </property>
+       </widget>
+       <widget class="QStackedWidget" name="stackedWidget">
+        <property name="geometry">
+         <rect>
+          <x>9</x>
+          <y>96</y>
+          <width>751</width>
+          <height>381</height>
+         </rect>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="page">
          <widget class="QChartView" name="graphicsView">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>751</width>
+            <height>381</height>
+           </rect>
+          </property>
           <property name="font">
            <font>
             <stylestrategy>PreferAntialias</stylestrategy>
            </font>
           </property>
          </widget>
-        </item>
-        <item row="0" column="5">
-         <widget class="QLineEdit" name="com">
-          <property name="inputMask">
-           <string/>
-          </property>
-          <property name="text">
-           <string>Commentaire</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QCheckBox" name="debit">
-          <property name="text">
-           <string>Debit</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="3">
-         <widget class="QCheckBox" name="auto_2">
-          <property name="text">
-           <string>Auto</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0" colspan="4">
-         <widget class="QLabel" name="totalDebit">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>TextLabel</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="4" colspan="3">
-         <widget class="QProgressBar" name="progressBar">
-          <property name="value">
-           <number>24</number>
-          </property>
-         </widget>
-        </item>
-       </layout>
+        </widget>
+        <widget class="QWidget" name="page_2"/>
+       </widget>
+       <widget class="QPushButton" name="stackAfter">
+        <property name="geometry">
+         <rect>
+          <x>120</x>
+          <y>70</y>
+          <width>75</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>&gt;</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="stackBefore">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>70</y>
+          <width>75</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>&lt;</string>
+        </property>
+       </widget>
       </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
