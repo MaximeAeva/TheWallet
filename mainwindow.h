@@ -26,7 +26,7 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void loadhistoric(QSqlDatabase db);
-    void loadgraphic(QSqlDatabase db);
+    void loadgraphic();
 
 public slots:
     void savequery();

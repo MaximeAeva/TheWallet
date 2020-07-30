@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent)
         if (db.open()) {
             std::cout<<"you're connected"<<std::endl;
             loadhistoric(db);
-            loadgraphic(db);
+            loadgraphic();
             connect(ui->save, SIGNAL(clicked()), this, SLOT(savequery()));
         }
         else {
@@ -53,7 +53,7 @@ void MainWindow::savequery()
     ui->date_em->setDate(QDate::currentDate());
 
     loadhistoric(db);
-    loadgraphic(db);
+    loadgraphic();
 }
 
 void MainWindow::loadhistoric(QSqlDatabase db)
@@ -66,30 +66,31 @@ void MainWindow::loadhistoric(QSqlDatabase db)
     ui->tableView->setModel(mod);
 }
 
-void MainWindow::loadgraphic(QSqlDatabase db)
+void MainWindow::loadgraphic()
 {
     QPieSeries *series = new QPieSeries();
-    QPieSlice *slices = new QPieSlice();
 
         QSqlQueryModel *perc = new QSqlQueryModel;
         perc->setQuery("SELECT 100-(SELECT SUM(montant) FROM transaction WHERE debit='True' "
-                    "AND date_em >= (SELECT LAST_VALUE(date_em) OVER (ORDER BY date_em ASC) "
-                    "FROM transaction WHERE context = 'Salaire'))*100/"
+                    "AND date_em >= (SELECT LAST_VALUE(date_em) OVER (ORDER BY date_em DESC) "
+                    "FROM transaction WHERE context = 'Salaire' LIMIT 1))*100/"
                     "(SELECT SUM(montant) FROM transaction WHERE debit='False' "
-                    "AND date_em >= (SELECT LAST_VALUE(date_em) OVER (ORDER BY date_em ASC) "
-                    "FROM transaction WHERE context = 'Salaire')) as p");
+                    "AND date_em >= (SELECT LAST_VALUE(date_em) OVER (ORDER BY date_em DESC) "
+                    "FROM transaction WHERE context = 'Salaire' LIMIT 1)) as p");
 
         QSqlQueryModel *total = new QSqlQueryModel;
         total->setQuery("SELECT SUM(montant) as tot FROM transaction WHERE debit='True' "
-                        "AND date_em >= (SELECT LAST_VALUE(date_em) OVER (ORDER BY date_em ASC) "
-                        "FROM transaction WHERE context = 'Salaire')");
+                        "AND date_em >= (SELECT LAST_VALUE(date_em) OVER (ORDER BY date_em DESC) "
+                        "FROM transaction WHERE context = 'Salaire' LIMIT 1)");
 
         QSqlQueryModel *counter = new QSqlQueryModel;
         counter->setQuery("SELECT COUNT(DISTINCT context) as menu FROM transaction"
-                          " WHERE context <> 'Salaire' AND date_em >= (SELECT LAST_VALUE(date_em) OVER (ORDER BY date_em ASC) FROM transaction WHERE context = 'Salaire')");
+                          " WHERE context <> 'Salaire' AND date_em >= (SELECT LAST_VALUE(date_em) "
+                          "OVER (ORDER BY date_em DESC) FROM transaction WHERE context = 'Salaire' LIMIT 1)");
         QSqlQueryModel *model = new QSqlQueryModel;
         model->setQuery("SELECT SUM(montant) as montant, context FROM transaction"
-                        " WHERE debit='True' AND date_em >= (SELECT LAST_VALUE(date_em) OVER (ORDER BY date_em ASC) FROM transaction WHERE context = 'Salaire') GROUP BY context");
+                        " WHERE debit='True' AND date_em >= (SELECT LAST_VALUE(date_em) "
+                        "OVER (ORDER BY date_em DESC) FROM transaction WHERE context = 'Salaire' LIMIT 1) GROUP BY context");
         for(int i=0; i<counter->record(0).value("menu").toInt();i++)
         {
             series->append(model->record(i).value("context").toString(),model->record(i).value("montant").toFloat());
