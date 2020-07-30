@@ -217,32 +217,36 @@
           </property>
          </widget>
         </widget>
-        <widget class="QWidget" name="page_2"/>
+        <widget class="QWidget" name="page_2">
+         <widget class="QChartView" name="graphicsView_2">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>751</width>
+            <height>381</height>
+           </rect>
+          </property>
+          <property name="font">
+           <font>
+            <stylestrategy>PreferAntialias</stylestrategy>
+           </font>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="page_3"/>
        </widget>
-       <widget class="QPushButton" name="stackAfter">
+       <widget class="QSlider" name="slider">
         <property name="geometry">
          <rect>
-          <x>120</x>
+          <x>150</x>
           <y>70</y>
-          <width>75</width>
-          <height>23</height>
+          <width>411</width>
+          <height>22</height>
          </rect>
         </property>
-        <property name="text">
-         <string>&gt;</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="stackBefore">
-        <property name="geometry">
-         <rect>
-          <x>40</x>
-          <y>70</y>
-          <width>75</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>&lt;</string>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </widget>
@@ -322,15 +326,31 @@
    <sender>Quit</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
+   <slot>quit()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>376</x>
+     <y>561</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>413</x>
+     <y>546</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Quit</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>338</x>
-     <y>566</y>
+     <x>258</x>
+     <y>562</y>
     </hint>
     <hint type="destinationlabel">
-     <x>348</x>
-     <y>572</y>
+     <x>278</x>
+     <y>544</y>
     </hint>
    </hints>
   </connection>

@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
             std::cout<<"you're connected"<<std::endl;
             loadhistoric(db);
             loadgraphic();
-            connect(ui->save, SIGNAL(clicked()), this, SLOT(savequery()));
+            connect(ui->save, SIGNAL(clicked()), this, SLOT(changeStack()));
         }
         else {
             std::cout<<"Connection failed"<<std::endl;
