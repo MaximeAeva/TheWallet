@@ -13,6 +13,7 @@
 #include <QtCharts>
 #include <QDate>
 #include <iostream>
+#include <fstream>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -25,8 +26,6 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void loadhistoric(QSqlDatabase db);
-    void loadgraphic();
 
 public slots:
     void savequery();
@@ -34,5 +33,9 @@ public slots:
 private:
     Ui::MainWindow *ui;
     QSqlDatabase db;
+    void loadhistoric();
+    void loadgraphic();
+    QString Readconfig(std::string paramName);
+    bool ConnectDB();
 };
 #endif // MAINWINDOW_H

@@ -7,23 +7,21 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     ui->date_em->setDate(QDate::currentDate());
+    this->setWindowTitle(Readconfig("WINDOW"));
+    this->setWindowIcon(QIcon(Readconfig("ICON")));
 
-    QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL");
-        db.setHostName("localhost");
-        db.setDatabaseName("PennyDB");
-        db.setUserName("postgres");
-        db.setPassword("maxime3108");
-        if (db.open()) {
-            std::cout<<"you're connected"<<std::endl;
-            loadhistoric(db);
-            loadgraphic();
-            connect(ui->save, SIGNAL(clicked()), this, SLOT(changeStack()));
-        }
-        else {
-            std::cout<<"Connection failed"<<std::endl;
-            qDebug() << db.drivers();
-            qDebug() << db.lastError();
-        }
+    if(ConnectDB())
+    {
+        std::cout<<"you're connected"<<std::endl;
+        loadhistoric();
+        loadgraphic();
+        connect(ui->save, SIGNAL(clicked()), this, SLOT(changeStack()));
+    }
+    else {
+        std::cout<<"Connection failed"<<std::endl;
+        qDebug() << db.drivers();
+        qDebug() << db.lastError();
+    }
 }
 
 void MainWindow::savequery()
@@ -52,11 +50,11 @@ void MainWindow::savequery()
     ui->com->clear();
     ui->date_em->setDate(QDate::currentDate());
 
-    loadhistoric(db);
+    loadhistoric();
     loadgraphic();
 }
 
-void MainWindow::loadhistoric(QSqlDatabase db)
+void MainWindow::loadhistoric()
 {
     QSqlQueryModel *mod = new QSqlQueryModel();
     QSqlQuery *query = new QSqlQuery(db);
@@ -114,6 +112,41 @@ void MainWindow::loadgraphic()
 
 MainWindow::~MainWindow()
 {
+    db.close();
     delete ui;
+}
+
+QString MainWindow::Readconfig(std::string paramName)//Read config file
+{
+    std::ifstream cfg("config.txt");
+    if(!cfg.is_open())
+    {
+        std::cout << "failed" << std::endl;
+        return 0;
+    }
+    std::string parm, value;
+    while (cfg >> parm >> value)
+    {
+        if(parm== paramName){return QString::fromStdString(value);}
+    }
+    return 0;
+}
+
+bool MainWindow::ConnectDB()//Connect to DB
+{
+    db = QSqlDatabase::addDatabase(Readconfig("DRIVER"));
+    db.setHostName(Readconfig("HOST"));
+    db.setDatabaseName(Readconfig("NAME"));
+    db.setUserName(Readconfig("USER"));
+    db.setPassword(Readconfig("PASSWORD"));
+    if(db.open())
+    {
+        return 1;
+    }
+    else
+    {
+        qDebug() << db.lastError();
+        return 0;
+    }
 }
 
