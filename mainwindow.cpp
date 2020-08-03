@@ -103,7 +103,26 @@ void MainWindow::loadgraphic()
            chart->setTitle("Dépenses");
            chart->legend()->hide();
 
+    QLineSeries *lines = new QLineSeries();
+        QSqlQueryModel *timeserie = new QSqlQueryModel;
+        timeserie->setQuery("SELECT date_em AS date, SUM(CASE WHEN debit='t' THEN -montant ELSE montant END) AS ts"
+                            "OVER (ORDER BY date_em) FROM transaction");
+        QSqlQueryModel *count = new QSqlQueryModel;
+        count->setQuery("SELECT COUNT(DISTINCT date_em) FROM transaction");
+
+        for(int i=0; i<count->record(0).value("cnt").toInt();i++)
+        {
+            lines->append(i,timeserie->record(i).value("ts").toFloat());
+        }
+
+        QChart *chart2 = new QChart();
+        chart2->addSeries(lines);
+        chart2->setTitle("OverTime");
+        chart2->legend()->hide();
+
            ui->graphicsView->setChart(chart);
+
+           ui->graphicsView_2->setChart(chart2);
 
            ui->totalDebit->setText(total->record(0).value("tot").toString());
 
