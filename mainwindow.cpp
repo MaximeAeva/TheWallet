@@ -106,18 +106,34 @@ void MainWindow::loadgraphic()
     QLineSeries *lines = new QLineSeries();
     QSqlQueryModel *timeserie = new QSqlQueryModel;
     timeserie->setQuery("SELECT date_em AS date, SUM(CASE WHEN debit='t' THEN -montant ELSE montant END) AS ts "
-                        "OVER (ORDER BY date_em) FROM transaction");
+                        "FROM transaction GROUP BY date ORDER BY date");
     QSqlQueryModel *count = new QSqlQueryModel;
     count->setQuery("SELECT COUNT(DISTINCT date_em) as cnt FROM transaction");
-
+    float totalMoney = 0;
     for(int i=0; i<count->record(0).value("cnt").toInt();i++)
     {
-        lines->append(i,timeserie->record(i).value("ts").toFloat());
+        totalMoney += timeserie->record(i).value("ts").toFloat();
+        QDateTime d = timeserie->record(i).value("date").toDateTime();
+        lines->append(d.toMSecsSinceEpoch(),totalMoney);
     }
 
     QChart *chart2 = new QChart();
     chart2->addSeries(lines);
     chart2->setTitle("OverTime");
+
+    QDateTimeAxis *axisX = new QDateTimeAxis;
+    axisX->setTickCount(10);
+    axisX->setFormat("dd mm yyyy");
+    axisX->setTitleText("Date");
+    chart2->addAxis(axisX, Qt::AlignBottom);
+    lines->attachAxis(axisX);
+
+    QValueAxis *axisY = new QValueAxis;
+    axisY->setLabelFormat("%f");
+    axisY->setTitleText("Value");
+    chart2->addAxis(axisY, Qt::AlignLeft);
+    lines->attachAxis(axisY);
+
     chart2->legend()->hide();
 
    ui->graphicsView->setChart(chart);
