@@ -66,43 +66,44 @@ void MainWindow::loadhistoric()
 
 void MainWindow::loadgraphic()
 {
+    //Percentage progress bar
+    QSqlQueryModel *perc = new QSqlQueryModel;
+    perc->setQuery("SELECT 100-(SELECT SUM(montant) FROM transaction WHERE debit='True' "
+                "AND date_em >= (SELECT LAST_VALUE(date_em) OVER (ORDER BY date_em DESC) "
+                "FROM transaction WHERE context = 'Salaire' LIMIT 1))*100/"
+                "(SELECT SUM(montant) FROM transaction WHERE debit='False' "
+                "AND date_em >= (SELECT LAST_VALUE(date_em) OVER (ORDER BY date_em DESC) "
+                "FROM transaction WHERE context = 'Salaire' LIMIT 1)) as p");
+
+    //Total spent since last salary
+    QSqlQueryModel *total = new QSqlQueryModel;
+    total->setQuery("SELECT SUM(montant) as tot FROM transaction WHERE debit='True' "
+                    "AND date_em >= (SELECT LAST_VALUE(date_em) OVER (ORDER BY date_em DESC) "
+                    "FROM transaction WHERE context = 'Salaire' LIMIT 1)");
+
+    //Context share this month
     QPieSeries *series = new QPieSeries();
+    QSqlQueryModel *counter = new QSqlQueryModel;
+    counter->setQuery("SELECT COUNT(DISTINCT context) as menu FROM transaction"
+                      " WHERE context <> 'Salaire' AND date_em >= (SELECT LAST_VALUE(date_em) "
+                      "OVER (ORDER BY date_em DESC) FROM transaction WHERE context = 'Salaire' LIMIT 1)");
+    QSqlQueryModel *model = new QSqlQueryModel;
+    model->setQuery("SELECT SUM(montant) as montant, context FROM transaction"
+                    " WHERE debit='True' AND date_em >= (SELECT LAST_VALUE(date_em) "
+                    "OVER (ORDER BY date_em DESC) FROM transaction WHERE context = 'Salaire' LIMIT 1) GROUP BY context");
+    for(int i=0; i<counter->record(0).value("menu").toInt();i++)
+    {
+        series->append(model->record(i).value("context").toString(),model->record(i).value("montant").toFloat());
+        series->slices().at(i)->setLabelVisible();
 
-        QSqlQueryModel *perc = new QSqlQueryModel;
-        perc->setQuery("SELECT 100-(SELECT SUM(montant) FROM transaction WHERE debit='True' "
-                    "AND date_em >= (SELECT LAST_VALUE(date_em) OVER (ORDER BY date_em DESC) "
-                    "FROM transaction WHERE context = 'Salaire' LIMIT 1))*100/"
-                    "(SELECT SUM(montant) FROM transaction WHERE debit='False' "
-                    "AND date_em >= (SELECT LAST_VALUE(date_em) OVER (ORDER BY date_em DESC) "
-                    "FROM transaction WHERE context = 'Salaire' LIMIT 1)) as p");
+    }
 
-        QSqlQueryModel *total = new QSqlQueryModel;
-        total->setQuery("SELECT SUM(montant) as tot FROM transaction WHERE debit='True' "
-                        "AND date_em >= (SELECT LAST_VALUE(date_em) OVER (ORDER BY date_em DESC) "
-                        "FROM transaction WHERE context = 'Salaire' LIMIT 1)");
+   QChart *chart = new QChart();
+   chart->addSeries(series);
+   chart->setTitle("Dépenses");
+   chart->legend()->hide();
 
-        QSqlQueryModel *counter = new QSqlQueryModel;
-        counter->setQuery("SELECT COUNT(DISTINCT context) as menu FROM transaction"
-                          " WHERE context <> 'Salaire' AND date_em >= (SELECT LAST_VALUE(date_em) "
-                          "OVER (ORDER BY date_em DESC) FROM transaction WHERE context = 'Salaire' LIMIT 1)");
-        QSqlQueryModel *model = new QSqlQueryModel;
-        model->setQuery("SELECT SUM(montant) as montant, context FROM transaction"
-                        " WHERE debit='True' AND date_em >= (SELECT LAST_VALUE(date_em) "
-                        "OVER (ORDER BY date_em DESC) FROM transaction WHERE context = 'Salaire' LIMIT 1) GROUP BY context");
-        for(int i=0; i<counter->record(0).value("menu").toInt();i++)
-        {
-            series->append(model->record(i).value("context").toString(),model->record(i).value("montant").toFloat());
-            series->slices().at(i)->setLabelVisible();
-
-        }
-
-
-
-           QChart *chart = new QChart();
-           chart->addSeries(series);
-           chart->setTitle("Dépenses");
-           chart->legend()->hide();
-
+   //Owned money through the age
     QLineSeries *lines = new QLineSeries();
     QSqlQueryModel *timeserie = new QSqlQueryModel;
     timeserie->setQuery("SELECT date_em AS date, SUM(CASE WHEN debit='t' THEN -montant ELSE montant END) AS ts "
@@ -119,26 +120,86 @@ void MainWindow::loadgraphic()
 
     QChart *chart2 = new QChart();
     chart2->addSeries(lines);
+    chart2->legend()->hide();
     chart2->setTitle("OverTime");
 
     QDateTimeAxis *axisX = new QDateTimeAxis;
     axisX->setTickCount(10);
-    axisX->setFormat("dd mm yyyy");
+    axisX->setFormat("dd MMM");
     axisX->setTitleText("Date");
     chart2->addAxis(axisX, Qt::AlignBottom);
     lines->attachAxis(axisX);
 
     QValueAxis *axisY = new QValueAxis;
-    axisY->setLabelFormat("%f");
+    axisY->setLabelFormat("%i");
     axisY->setTitleText("Value");
     chart2->addAxis(axisY, Qt::AlignLeft);
     lines->attachAxis(axisY);
 
-    chart2->legend()->hide();
+    //Shared overall
+    QPieSeries *overallPie = new QPieSeries();
+    QSqlQueryModel *contextCnt = new QSqlQueryModel;
+    contextCnt->setQuery("SELECT COUNT(DISTINCT context) as cnt FROM transaction");
+    QSqlQueryModel *model2 = new QSqlQueryModel;
+    model2->setQuery("SELECT context as ctx, SUM(montant) as value FROM transaction "
+                     "WHERE debit = 't' GROUP BY context");
+    for(int i=0; i<contextCnt->record(0).value("cnt").toInt();i++)
+    {
+        overallPie->append(model2->record(i).value("ctx").toString(),model2->record(i).value("value").toFloat());
+        overallPie->slices().at(i)->setLabelVisible();
+
+    }
+
+    QChart *chart3 = new QChart();
+    chart3->addSeries(overallPie);
+    chart3->setTitle("Répartition générale");
+    chart3->legend()->hide();
+
+    //Bar chart mean spent per month
+    QBarSet *set = new QBarSet("depense");
+    QStringList month;
+    QSqlQueryModel *allCnt = new QSqlQueryModel;
+    allCnt->setQuery("SELECT COUNT(*) as cnt FROM transaction");
+    QSqlQueryModel *model3 = new QSqlQueryModel;
+    model3->setQuery("SELECT montant as mt, debit as deb, date_em as dat FROM transaction ORDER BY dat");
+    float k = 0;
+    for(int i=0; i<allCnt->record(0).value("cnt").toInt();i++)
+    {
+        if(!model3->record(i).value("deb").toBool())
+        {
+            QDateTime d = model3->record(i).value("dat").toDateTime();
+            month << d.toString("MMM");
+            *set << k;
+            k = 0;
+        }
+        else k += model3->record(i).value("mt").toFloat();
+
+    }
+
+    QBarSeries *barseries = new QBarSeries();
+    barseries->append(set);
+
+    QChart *chart4 = new QChart();
+    chart4->addSeries(barseries);
+    chart4->setTitle("Dépense par mois");
+    chart4->legend()->hide();
+
+    QBarCategoryAxis *axisX1 = new QBarCategoryAxis();
+    axisX1->append(month);
+    chart4->addAxis(axisX1, Qt::AlignBottom);
+    barseries->attachAxis(axisX1);
+
+    QValueAxis *axisY1 = new QValueAxis();
+    chart4->addAxis(axisY1, Qt::AlignLeft);
+    barseries->attachAxis(axisY1);
 
    ui->graphicsView->setChart(chart);
 
    ui->graphicsView_2->setChart(chart2);
+
+   ui->graphicsView_3->setChart(chart3);
+
+   ui->graphicsView_4->setChart(chart4);
 
    ui->totalDebit->setText(total->record(0).value("tot").toString());
 

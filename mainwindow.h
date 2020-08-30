@@ -12,6 +12,7 @@
 #include <QGraphicsItem>
 #include <QtCharts>
 #include <QDate>
+#include <vector>
 #include <iostream>
 #include <fstream>
 
