@@ -131,6 +131,7 @@ void MainWindow::loadgraphic()
     lines->attachAxis(axisX);
 
     QValueAxis *axisY = new QValueAxis;
+    axisY->setTickCount(10);
     axisY->setLabelFormat("%i");
     axisY->setTitleText("Value");
     chart2->addAxis(axisY, Qt::AlignLeft);
@@ -163,24 +164,37 @@ void MainWindow::loadgraphic()
     QSqlQueryModel *model3 = new QSqlQueryModel;
     model3->setQuery("SELECT montant as mt, debit as deb, date_em as dat FROM transaction ORDER BY dat");
     float k = 0;
+    float meanSpent = 0;
+    int indexor = 0;
     for(int i=0; i<allCnt->record(0).value("cnt").toInt();i++)
     {
         if(!model3->record(i).value("deb").toBool())
         {
+            indexor ++;
             QDateTime d = model3->record(i).value("dat").toDateTime();
             month << d.toString("MMM");
             *set << k;
+            meanSpent += k;
             k = 0;
         }
         else k += model3->record(i).value("mt").toFloat();
 
     }
 
+    QLineSeries *myMean = new QLineSeries;
+    for(int i = 0; i<indexor; i++) myMean->append(i, meanSpent/indexor);
+
+    QPen pen = myMean->pen();
+    pen.setWidth(1);
+    pen.setBrush(QBrush("red"));
+    myMean->setPen(pen);
+
     QBarSeries *barseries = new QBarSeries();
     barseries->append(set);
 
     QChart *chart4 = new QChart();
     chart4->addSeries(barseries);
+    chart4->addSeries(myMean);
     chart4->setTitle("Dépense par mois");
     chart4->legend()->hide();
 
@@ -188,10 +202,13 @@ void MainWindow::loadgraphic()
     axisX1->append(month);
     chart4->addAxis(axisX1, Qt::AlignBottom);
     barseries->attachAxis(axisX1);
+    myMean->attachAxis(axisX1);
 
     QValueAxis *axisY1 = new QValueAxis();
     chart4->addAxis(axisY1, Qt::AlignLeft);
     barseries->attachAxis(axisY1);
+    myMean->attachAxis(axisY1);
+    axisY1->setTickCount(10);
 
    ui->graphicsView->setChart(chart);
 
